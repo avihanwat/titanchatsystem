@@ -1,0 +1,20 @@
+[Unit]
+Description=TitanChat Kafka Consumer
+After=network.target redis.service kafka.service cassandra.service
+Requires=redis.service kafka.service
+Wants=cassandra.service
+
+[Service]
+Type=simple
+User=titanchat
+Group=titanchat
+WorkingDirectory=/opt/titanchat
+EnvironmentFile=/opt/titanchat/.env
+ExecStart=/opt/titanchat/venv/bin/python -m consumer.main
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/titanchat/consumer.log
+StandardError=append:/var/log/titanchat/consumer-error.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,191 @@
+### ═══════════════════════════════════════════════════════════════
+###  TitanChat API — Test Collection
+###  Use with VS Code REST Client extension (humao.rest-client)
+###  Base URL: http://localhost:8001
+### ═══════════════════════════════════════════════════════════════
+
+@baseUrl = http://localhost:8001
+
+### ─── Health Check ───────────────────────────────────────────────
+
+GET {{baseUrl}}/health
+
+### ═══════════════════════════════════════════════════════════════
+###  AUTH — Admin
+### ═══════════════════════════════════════════════════════════════
+
+### Register Admin
+POST {{baseUrl}}/auth/admin/register
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "SecurePass123!",
+  "name": "Test Admin"
+}
+
+### Login Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "SecurePass123!"
+}
+
+###
+@adminToken = {{adminLogin.response.body.access_token}}
+
+### ═══════════════════════════════════════════════════════════════
+###  BOTS
+### ═══════════════════════════════════════════════════════════════
+
+### Create Bot
+# @name createBot
+POST {{baseUrl}}/bots
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Website Chat Widget",
+  "config": {
+    "welcome_message": "Hello! How can I help you?",
+    "theme": "blue"
+  }
+}
+
+###
+@botId = {{createBot.response.body.id}}
+@botApiKey = {{createBot.response.body.api_key}}
+
+### List Bots
+GET {{baseUrl}}/bots
+Authorization: Bearer {{adminToken}}
+
+### Get Bot Detail
+GET {{baseUrl}}/bots/{{botId}}
+Authorization: Bearer {{adminToken}}
+
+### Update Bot
+PATCH {{baseUrl}}/bots/{{botId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Widget Name",
+  "config": {
+    "welcome_message": "Welcome! Ask me anything.",
+    "theme": "dark"
+  }
+}
+
+### Regenerate Bot API Key
+POST {{baseUrl}}/bots/{{botId}}/regenerate-key
+Authorization: Bearer {{adminToken}}
+
+### Delete Bot (soft delete)
+DELETE {{baseUrl}}/bots/{{botId}}
+Authorization: Bearer {{adminToken}}
+
+### ═══════════════════════════════════════════════════════════════
+###  AGENTS
+### ═══════════════════════════════════════════════════════════════
+
+### Create Agent
+# @name createAgent
+POST {{baseUrl}}/agents
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "agent1@example.com",
+  "password": "AgentPass456!",
+  "name": "Support Agent 1",
+  "skills": ["billing", "technical"],
+  "max_chats": 5
+}
+
+###
+@agentId = {{createAgent.response.body.id}}
+
+### List Agents
+GET {{baseUrl}}/agents
+Authorization: Bearer {{adminToken}}
+
+### Get Agent Detail
+GET {{baseUrl}}/agents/{{agentId}}
+Authorization: Bearer {{adminToken}}
+
+### Update Agent
+PATCH {{baseUrl}}/agents/{{agentId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Senior Support Agent",
+  "skills": ["billing", "technical", "escalation"],
+  "max_chats": 8
+}
+
+### Delete Agent (soft delete)
+DELETE {{baseUrl}}/agents/{{agentId}}
+Authorization: Bearer {{adminToken}}
+
+### ═══════════════════════════════════════════════════════════════
+###  AUTH — Agent
+### ═══════════════════════════════════════════════════════════════
+
+### Agent Login
+# @name agentLogin
+POST {{baseUrl}}/auth/agent/login
+Content-Type: application/json
+
+{
+  "email": "agent1@example.com",
+  "password": "AgentPass456!"
+}
+
+###
+@agentToken = {{agentLogin.response.body.access_token}}
+
+### ═══════════════════════════════════════════════════════════════
+###  CONVERSATIONS (requires Cassandra connection)
+### ═══════════════════════════════════════════════════════════════
+
+### List Conversations (Admin view — scoped to admin's bots)
+GET {{baseUrl}}/conversations?limit=20
+Authorization: Bearer {{adminToken}}
+
+### Get Conversation Detail
+GET {{baseUrl}}/conversations/conv-123-example
+Authorization: Bearer {{adminToken}}
+
+### Get Conversation Messages (with day bucket)
+GET {{baseUrl}}/conversations/conv-123-example/messages?bucket=20260528
+Authorization: Bearer {{adminToken}}
+
+### Get Conversation Messages (auto-scan last 7 days)
+GET {{baseUrl}}/conversations/conv-123-example/messages
+Authorization: Bearer {{adminToken}}
+
+### ═══════════════════════════════════════════════════════════════
+###  DASHBOARD (requires Redis connection)
+### ═══════════════════════════════════════════════════════════════
+
+### Dashboard Stats
+GET {{baseUrl}}/dashboard/stats
+Authorization: Bearer {{adminToken}}
+
+### Agent Statuses
+GET {{baseUrl}}/dashboard/agents
+Authorization: Bearer {{adminToken}}
+
+### Active Chats
+GET {{baseUrl}}/dashboard/active-chats
+Authorization: Bearer {{adminToken}}
+
+### ═══════════════════════════════════════════════════════════════
+###  WEBSOCKET — Bot Token Auth (for reference, not executable here)
+###  Connect: ws://localhost:8000/ws/{conversation_id}?bot_token={botApiKey}
+### ═══════════════════════════════════════════════════════════════

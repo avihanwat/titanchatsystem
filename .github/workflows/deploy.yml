@@ -1,0 +1,65 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: titan-social-media-crm
+  ZONE: us-central1-b
+  INSTANCE: titanchatsystem
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m pytest tests/unit -v --tb=short
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to VM
+        run: |
+          gcloud compute ssh ${{ env.INSTANCE }} \
+            --project=${{ env.PROJECT_ID }} \
+            --zone=${{ env.ZONE }} \
+            --tunnel-through-iap \
+            --command="bash /opt/titanchat/repo/deploy/deploy.sh"
+
+      - name: Health check
+        run: |
+          gcloud compute ssh ${{ env.INSTANCE }} \
+            --project=${{ env.PROJECT_ID }} \
+            --zone=${{ env.ZONE }} \
+            --tunnel-through-iap \
+            --command="bash /opt/titanchat/repo/deploy/healthcheck.sh"

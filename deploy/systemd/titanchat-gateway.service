@@ -1,0 +1,20 @@
+[Unit]
+Description=TitanChat Gateway (FastAPI + WebSocket)
+After=network.target redis.service kafka.service cassandra.service postgresql.service
+Requires=redis.service
+Wants=kafka.service cassandra.service postgresql.service
+
+[Service]
+Type=simple
+User=titanchat
+Group=titanchat
+WorkingDirectory=/opt/titanchat
+EnvironmentFile=/opt/titanchat/.env
+ExecStart=/opt/titanchat/venv/bin/uvicorn gateway.main:app --host 0.0.0.0 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/titanchat/gateway.log
+StandardError=append:/var/log/titanchat/gateway-error.log
+
+[Install]
+WantedBy=multi-user.target
