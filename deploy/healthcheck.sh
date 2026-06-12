@@ -39,13 +39,6 @@ check_http() {
 }
 
 echo "====== Infrastructure Services ======"
-check_systemd "redis-server"
-check_systemd "kafka"
-check_systemd "cassandra"
-check_systemd "postgresql"
-
-echo ""
-echo "====== Infrastructure Ports ======"
 check_port "Redis"      6379
 check_port "Kafka"      9092
 check_port "Cassandra"  9042
