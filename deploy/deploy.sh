@@ -4,10 +4,6 @@ set -euo pipefail
 
 APP_DIR="/opt/titanchat"
 
-echo "==> Extracting uploaded code..."
-sudo -u titanchat tar xzf /tmp/titanchat.tar.gz -C "$APP_DIR/" --overwrite
-rm -f /tmp/titanchat.tar.gz
-
 echo "==> Installing/updating dependencies..."
 cd "$APP_DIR"
 source venv/bin/activate
