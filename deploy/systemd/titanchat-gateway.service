@@ -1,8 +1,7 @@
 [Unit]
 Description=TitanChat Gateway (FastAPI + WebSocket)
-After=network.target redis.service kafka.service cassandra.service postgresql.service
-Requires=redis.service
-Wants=kafka.service cassandra.service postgresql.service
+After=network.target redis-server.service kafka.service cassandra.service postgresql.service
+Wants=redis-server.service kafka.service cassandra.service postgresql.service
 
 [Service]
 Type=simple

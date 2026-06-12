@@ -1,8 +1,7 @@
 [Unit]
 Description=TitanChat Kafka Consumer
-After=network.target redis.service kafka.service cassandra.service
-Requires=redis.service kafka.service
-Wants=cassandra.service
+After=network.target redis-server.service kafka.service cassandra.service
+Wants=redis-server.service kafka.service cassandra.service
 
 [Service]
 Type=simple

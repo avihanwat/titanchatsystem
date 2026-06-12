@@ -1,7 +1,7 @@
 [Unit]
 Description=TitanChat API (Admin/Auth)
-After=network.target redis.service postgresql.service
-Requires=redis.service postgresql.service
+After=network.target redis-server.service postgresql.service
+Wants=redis-server.service postgresql.service
 
 [Service]
 Type=simple
