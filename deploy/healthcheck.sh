@@ -39,7 +39,7 @@ check_http() {
 }
 
 echo "====== Infrastructure Services ======"
-check_systemd "redis"
+check_systemd "redis-server"
 check_systemd "kafka"
 check_systemd "cassandra"
 check_systemd "postgresql"
