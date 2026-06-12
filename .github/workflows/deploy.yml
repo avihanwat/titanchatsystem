@@ -62,7 +62,7 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --zone=${{ env.ZONE }} \
             --tunnel-through-iap \
-            --command="sudo bash -c 'tar xzf /tmp/titanchat.tar.gz -C /opt/titanchat/ && rm -f /tmp/titanchat.tar.gz && chown -R titanchat:titanchat /opt/titanchat/ && bash /opt/titanchat/deploy/deploy.sh'"
+            --command="sudo bash -c 'mkdir -p /opt/titanchat && tar xzf /tmp/titanchat.tar.gz -C /opt/titanchat/ && rm -f /tmp/titanchat.tar.gz && id -u titanchat &>/dev/null || useradd -r -m -s /bin/bash titanchat && chown -R titanchat:titanchat /opt/titanchat/ && bash /opt/titanchat/deploy/deploy.sh'"
 
       - name: Health check
         run: |
