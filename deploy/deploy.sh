@@ -3,21 +3,10 @@
 set -euo pipefail
 
 APP_DIR="/opt/titanchat"
-REPO_DIR="$APP_DIR/repo"
 
-echo "==> Pulling latest code..."
-cd "$REPO_DIR"
-git fetch origin main
-git reset --hard origin/main
-
-echo "==> Syncing code to app directory..."
-rsync -a --delete \
-  --exclude='venv' \
-  --exclude='.env' \
-  --exclude='__pycache__' \
-  --exclude='.git' \
-  --exclude='.pytest_cache' \
-  "$REPO_DIR/" "$APP_DIR/"
+echo "==> Extracting uploaded code..."
+sudo -u titanchat tar xzf /tmp/titanchat.tar.gz -C "$APP_DIR/" --overwrite
+rm -f /tmp/titanchat.tar.gz
 
 echo "==> Installing/updating dependencies..."
 cd "$APP_DIR"

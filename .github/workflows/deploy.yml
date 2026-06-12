@@ -48,13 +48,21 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to VM
+      - name: Upload code to VM
+        run: |
+          tar czf /tmp/titanchat.tar.gz --exclude='.git' --exclude='venv' --exclude='__pycache__' --exclude='.pytest_cache' .
+          gcloud compute scp /tmp/titanchat.tar.gz ${{ env.INSTANCE }}:/tmp/titanchat.tar.gz \
+            --project=${{ env.PROJECT_ID }} \
+            --zone=${{ env.ZONE }} \
+            --tunnel-through-iap
+
+      - name: Deploy on VM
         run: |
           gcloud compute ssh ${{ env.INSTANCE }} \
             --project=${{ env.PROJECT_ID }} \
             --zone=${{ env.ZONE }} \
             --tunnel-through-iap \
-            --command="bash /opt/titanchat/repo/deploy/deploy.sh"
+            --command="sudo bash /opt/titanchat/repo/deploy/deploy.sh"
 
       - name: Health check
         run: |
@@ -62,4 +70,4 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --zone=${{ env.ZONE }} \
             --tunnel-through-iap \
-            --command="bash /opt/titanchat/repo/deploy/healthcheck.sh"
+            --command="sudo bash /opt/titanchat/repo/deploy/healthcheck.sh"

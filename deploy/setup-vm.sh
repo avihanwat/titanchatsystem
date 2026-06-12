@@ -4,7 +4,7 @@
 set -euo pipefail
 
 APP_DIR="/opt/titanchat"
-REPO_URL="https://github.com/YOUR_ORG/titanchatsystem.git"  # <-- UPDATE THIS
+REPO_URL="git@github.com:avihanwat/titanchatsystem.git"
 
 echo "==> Creating titanchat user..."
 id -u titanchat &>/dev/null || useradd -r -m -s /bin/bash titanchat
